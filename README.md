@@ -1,4 +1,12 @@
 # 网易云音乐个性化纠正工具
+详细用alter
+先使用refresh 输入歌单id 会自己刷新init.config里的id
+然后输入账号密码即可  软件内歌单id一行请勿手动更改 只能通过refresh去刷新
+
+
+
+
+
 
 快速刷单曲播放次数，完整文档见：https://zaincheung.github.io/netease-cloud
 
