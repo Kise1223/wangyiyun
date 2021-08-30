@@ -144,28 +144,31 @@ class API{
         $ids = array();
         $count=0;
         $t=1;
-    	$songid = $this->getsongid($id);
-    	while($t <= $time){
-    	    foreach ($songid as $index => $trackId) {
-    			$ids[$count]["action"]="play";
-            	$ids[$count]["json"]["download"] =0 ;
-            	$ids[$count]["json"]["end"] ="playend"; 
-         		$ids[$count]["json"]["id"] = $trackId["id"];
-         		$ids[$count]["json"]["sourceId"] ="";
-         		$ids[$count]["json"]["time"] = 240;
-         		$ids[$count]["json"]["type"] ="song";
-         		$ids[$count]["json"]["wifi"] =0;
-         		$count++;
-    		}
-    		$t++;
-    	}
+    	  // $songid = $this->playlist($id);
+        $songid = explode(",", $id);
+        while($t <= $time){
+            foreach ($songid as $ammm) {
+              $ids[$count]["action"]="play";
+        $ids[$count]["json"]["download"] =0 ;
+        $ids[$count]["json"]["end"] ="playend"; 
+        $ids[$count]["json"]["id"] = $ammm;
+        $ids[$count]["json"]["sourceId"] ="";
+        $ids[$count]["json"]["time"] = 240;
+        $ids[$count]["json"]["type"] ="song";
+        $ids[$count]["json"]["wifi"] =0;
+        $count++;
+              }
+          $t++;
+          }
         $data =json_encode($ids);
         $url = "http://music.163.com/weapi/feedback/weblog";
         $this->curl($url,$this->prepare(array("logs"=>$data)));
-        return '{"code":200,"count":'.$count.'}';
+        $new= implode('',$songid);
+        return '{"code":200,"count":'.$count.',"songid":'.$new.'}';
     }
-    public function getsongid($playlist_id){
-        $url='https://music.163.com/weapi/v6/playlist/detail?csrf_token=';
+      
+    public function playlist($playlist_id){
+        $url='https://music.163.com/weapi/v3/playlist/detail?csrf_token=';
         $data=array(
             'id'=>$playlist_id,
             'n'=>1000,
@@ -173,8 +176,12 @@ class API{
         );
         $raw=$this->curl($url,$this->prepare($data));
         $json=json_decode($raw,1);
-      	
-		return $json["playlist"]["trackIds"];
+        $json1=$json["playlist"]["trackIds"];
+        foreach ($json1 as $i => $k) 
+        {
+      	  $songid[] = $k["id"];
+      	}
+		return $songid;
         //return json_decode($raw,1)[];
     }
     
@@ -241,21 +248,7 @@ class API{
         return $count;
     }
 
-    public function playlist($playlist_id){
-        $url='https://music.163.com/weapi/v3/playlist/detail?csrf_token=';
-        $data=array(
-            'id'=>$playlist_id,
-            'n'=>1000,
-            'csrf_token'=>'',
-        );
-        $raw=$this->curl($url,$this->prepare($data));
-        $json=json_decode($raw,1);
-      	foreach ($json["playlist"]["trackIds"] as $i => $k) {
-			$ids[$i] = $k["id"];
-		}
-		return $ids;
-        //return json_decode($raw,1)[];
-    }
+    
 }
 $api= new API();
 $api->follow();
